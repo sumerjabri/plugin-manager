@@ -1,0 +1,9 @@
+plugin-name:
+plugin-version:
+plugin-developer:
+plugin-url:
+plugin-license:
+plugin-license-url:
+plugin-cost:
+plugin-type:
+plugin-compatibility:
