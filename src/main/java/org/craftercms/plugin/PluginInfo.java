@@ -5,7 +5,6 @@ package org.craftercms.plugin;
  * Reflects Manifest.mf Information.
  */
 public class PluginInfo {
-
     private String id;
     private String name;
     private String version;
@@ -16,7 +15,7 @@ public class PluginInfo {
     private String cost;
     private String type;
     private String compatibility;
-    private PluginState state;
+    private PluginManager.PluginState state;
     private Class clazz;
 
     public PluginInfo() {
@@ -102,11 +101,11 @@ public class PluginInfo {
         this.compatibility = compatibility;
     }
 
-    public PluginState getState() {
+    public PluginManager.PluginState getState() {
         return this.state;
     }
 
-    public void setState(final PluginState state) {
+    public void setState(final PluginManager.PluginState state) {
         this.state = state;
     }
 

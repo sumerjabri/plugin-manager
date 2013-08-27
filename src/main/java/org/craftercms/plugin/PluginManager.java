@@ -1,175 +1,155 @@
 package org.craftercms.plugin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
- * Plugin Manager.
+ * @author Sumer Jabri
  */
-public final class PluginManager {
-
-    /**
-     * Plugin Info Map.
-     */
-    private Map<String, PluginInfo> registerPlugins;
-    /**
-     * Register Context for given pluginTypes.
-     */
-    private Map<String, Context> typeContexts;
-    private Logger log = LoggerFactory.getLogger(PluginManager.class);
-
-    public PluginManager(final String pluginFolder) {
-        this.typeContexts = new HashMap<String, Context>();
-        this.registerPlugins = new HashMap<String, PluginInfo>();
-        load();
+public interface PluginManager {
+    public enum PluginState {
+        /**
+         * Enabled and Active
+         */
+        ENABLED_ACTIVE,
+        /**
+         * Enabled and Inactive
+         */
+        ENABLED_INACTIVE,
+        /**
+         * Disabled
+         */
+        DISABLED
     }
 
     /**
-     * Get's and Cast Plugin to de given Class instance.
-     * @param pluginId Plugin id to get
-     * @param clazz Class to be Cast
-     * @param <T> Class to be wanted.
-     * @return A instance of the given class.
-     * @throws PluginException if Plugin can't be cast to it
-     */
-    public <T> T get(final String pluginId, final Class<T> clazz) throws PluginException {
-        try {
-            return clazz.cast(getPluginById(pluginId));
-        } catch (ClassCastException ex) {
-            this.log.error("Unable cast ", ex);
-            throw new PluginException("Unable to convert Plugin in to given class");
-        }
-    }
-
-    /**
-     * Gets PluginInfo for all plugins of the given type.
+     * Initialize the plugin manager
      *
-     * @param pluginType PluginType to get Metadata
-     * @return A list of PluginInfo for the given type <b>Or</b> empty list
-     *         if there are not plugins of the given type
+     * @param pluginFolders   folders that contain plugins
+     * @param contextRegistry API contexts registry for various plugin types
+     * @throws PluginException
      */
-    public List<PluginInfo> getPluginsInfo(String pluginType) {
-        return null;
-    }
+    public void init(List<String> pluginFolders, Map<String, Context> contextRegistry) throws PluginException;
+
+    /**
+     * Destroy the plugin manager
+     *
+     * @throws PluginException
+     */
+    public void destroy() throws PluginException;
 
     /**
      * Register a Context for the Given plugin type.
      * A context will be to the plugin to call {@link Plugin#init(Context)}
-     * <b>Each plugin type will have a different context</b>
+     * <b>Each plugin type will probably have a different context</b>
      *
      * @param type    Plugin Type.
      * @param context Context impl.
+     * @throws PluginException
      */
-    public void registerContext(final String type, final Context context) {
-        this.typeContexts.put(type, context);
-    }
+    public void registerContext(final String type, final Context context) throws PluginException;
 
     /**
-     * Gets a plugin by its name.
+     * Install a plugin on disk and load it as disabled
      *
-     * @param pluginId Plugin Id
-     * @return A plugin instance <b>or</b> Null if there not a plugin with the given id.
+     * @param plugin input stream of the plugin binary
+     * @throws PluginException
      */
-    private Plugin getPluginById(String pluginId) {
-        //TODO Add some cache
-        final PluginInfo info = this.registerPlugins.get(pluginId);
-        Plugin plugin = null;
-        try {
-            plugin = (Plugin) info.getClazz().newInstance();
-        } catch (InstantiationException | IllegalAccessException | ClassCastException ex) {
-            this.log.error("Unable to get plugin by due a exception", ex);
-            this.log.error("This is most likely to be due bad "
-                    + "configuration on manifest check that {} is a impl of Plugin class", info.getClazz()
-                    .getCanonicalName());
-            //Todo Handel this ex
-        }
-        return plugin;
-    }
-
-    public PluginInfo getPluginInfo(String pluginType) {
-        return null;
-    }
+    public void installPlugin(final InputStream plugin) throws PluginException;
 
     /**
-     * Enables A plugin, If plugin init throws exception
-     * this plugin will be automatically disable.
+     * Deactivate, destroy and delete a plugin from disk.
      *
-     * @param pluginId Plugin Id
+     * @param pluginId ID of the plugin to remove
+     * @throws PluginException
      */
-    public void enable(String pluginId) {
-        // plugin is Register
-        if ( this.registerPlugins.containsKey(pluginId) ) {
-            final PluginInfo pluginInfo = this.registerPlugins.get(pluginId);
-            if ( pluginInfo.getState() == PluginState.DISABLED ) {
-                try {
-                    getPluginById(pluginId).init(this.typeContexts.get(pluginInfo.getType()));
-                } catch (PluginException ex) {
-                    this.log.error("Unable to enable this plugin due exception, disabling plugin", ex);
-                    disable(pluginId);
-                }
-            }
-        }
-
-    }
+    public void uninstallPlugin(final String pluginId) throws PluginException;
 
     /**
-     * Disables a plugin.
-     * @param pluginId PluginId to disable
+     * Load a plugin from disk if not already loaded and initialize it by calling its init method, upon success
+     * set the state of the plugin to enabled
+     * If the init method of the plugin fails, the plugin is marked as disabled
+     *
+     * @param pluginId plugin Id
+     * @throws PluginException
      */
-    private void disable(String pluginId) {
-        getPluginInfo(pluginId).setState(PluginState.DISABLED);
-        //TODO Unload Stuff
-        //TODO Save to XML FILE
-    }
+    public void enablePlugin(String pluginId) throws PluginException;
 
     /**
-     * Gets All active Plugins.
-     * @return List of All Plugins in  PluginState.ENABLED_ACTIVE
+     * Call the destroy method of the plugin and mark it as disabled
+     *
+     * @param pluginId
+     * @throws PluginException
      */
-    public List<PluginInfo> getActivePlugins() {
-        return getPluginsByState(PluginState.ENABLED_ACTIVE);
-    }
+    public void disablePlugin(String pluginId) throws PluginException;
 
-    public List<PluginInfo> getInactivePlugins() {
-        return getPluginsByState(PluginState.ENABLED_INACTIVE);
-    }
+    /**
+     * Call the activate method of the plugin and mark it as active
+     *
+     * @param pluginId
+     * @throws PluginException
+     */
+    public void activatePlugin(String pluginId) throws PluginException;
 
-    public List<PluginInfo> getEnabledPlugin() {
-        return getPluginsByState(PluginState.ENABLED_ACTIVE);
-    }
+    /**
+     * Call the deactivate method of the plugin and mark it as inactive
+     *
+     * @param pluginId
+     * @throws PluginException
+     */
+    public void deactivatePlugin(String pluginId) throws PluginException;
 
-    public List<PluginInfo> getDisabledPlugin() {
-        return getPluginsByState(PluginState.DISABLED);
-    }
+    /**
+     * Return the plugin information
+     * @param pluginId Id of the plugin
+     * @return plugin information of type {@link PluginInfo}
+     * @throws PluginException
+     */
+    public PluginInfo getPluginInfo(String pluginId) throws PluginException;
 
-    public List<PluginInfo> getPluginsByState(PluginState state) {
-        final List<PluginInfo> activePlugins = new ArrayList<>();
-        for (String key : this.registerPlugins.keySet()) {
-            final PluginInfo info = this.registerPlugins.get(key);
-            if ( info.getState() == state ) {
-                activePlugins.add(info);
-            }
-        }
-        return Collections.unmodifiableList(activePlugins);
-    }
+    /**
+     * List all plugins in the system
+     * @return list of all plugins' {@link PluginInfo}
+     * @throws PluginException
+     */
+    public List<PluginInfo> listAllPlugins() throws PluginException;
 
-    private void load() {
-        // Loads Plugins from Paths
-        // Fill registerPlugins with ManifestInfo
-        // Open INFO XML.
-        // Update registerPlugins with states
-        // Update INFO XML (in case o new files)
-    }
+    /**
+     * List all plugins of a certain type
+     * @param pluginType type of plugin
+     * @return list of {@link PluginInfo}
+     * @throws PluginException
+     */
+    public List<PluginInfo> listPluginsByType(final String pluginType) throws PluginException;
 
-    private String getPluginType(final Plugin plugin) {
-        return "";
-    }
+    /**
+     * List all plugins by plugin state
+     * @param state plugin state, see {@link PluginManager.PluginState}
+     * @return list of {@link PluginInfo}
+     * @throws PluginException
+     */
+    public List<PluginInfo> listPluginsByState(final PluginState state) throws PluginException;
+
+    /**
+     * List plugins given a type and state
+     * @param pluginType plugin type
+     * @param state plugin state
+     * @return list of {@link PluginInfo}
+     * @throws PluginException
+     */
+    public List<PluginInfo> listPluginsByTypeByState(final String pluginType, final PluginState state)
+            throws PluginException;
 
 
+    /**
+     * Get a plugin instance cast to the class of the plugin
+     *
+     * @param pluginId Plugin id to get
+     * @param clazz    Class to be Cast
+     * @param <T>      Class to be wanted.
+     * @return A instance of the given class that implements {@link Plugin}
+     * @throws PluginException
+     */
+    public <T extends Plugin> T getPlugin(final String pluginId, final Class<T> clazz) throws PluginException;
 }
