@@ -22,10 +22,11 @@ import java.util.Map;
 
 /**
  * @author Sumer Jabri
+ * @author Carlos Ortiz.
  */
 public interface PluginManager {
     /**
-     * Initialize the plugin manager
+     * Initialize the plugin manager.
      *
      * @param pluginFolders   folders that contain plugins
      * @param contextRegistry API contexts registry for various plugin types
@@ -52,7 +53,7 @@ public interface PluginManager {
     void registerContext(final String type, final Context context) throws PluginException;
 
     /**
-     * Install a plugin on disk and load it as disabled
+     * Install a plugin on disk and load it as disabled.
      *
      * @param plugin input stream of the plugin binary
      * @throws PluginException
@@ -69,7 +70,7 @@ public interface PluginManager {
 
     /**
      * Load a plugin from disk if not already loaded and initialize it by calling its init method, upon success
-     * set the state of the plugin to enabled
+     * set the state of the plugin to enabled.
      * If the init method of the plugin fails, the plugin is marked as disabled
      *
      * @param pluginId plugin Id
@@ -78,7 +79,7 @@ public interface PluginManager {
     void enablePlugin(String pluginId) throws PluginException;
 
     /**
-     * Call the destroy method of the plugin and mark it as disabled
+     * Call the destroy method of the plugin and mark it as disabled.
      *
      * @param pluginId
      * @throws PluginException
@@ -86,7 +87,7 @@ public interface PluginManager {
     void disablePlugin(String pluginId) throws PluginException;
 
     /**
-     * Call the activate method of the plugin and mark it as active
+     * Call the activate method of the plugin and mark it as active.
      *
      * @param pluginId
      * @throws PluginException
@@ -102,7 +103,7 @@ public interface PluginManager {
     void deactivatePlugin(String pluginId) throws PluginException;
 
     /**
-     * Return the plugin information
+     * Return the plugin information.
      *
      * @param pluginId Id of the plugin
      * @return plugin information of type {@link PluginInfo}
@@ -111,7 +112,7 @@ public interface PluginManager {
     PluginInfo getPluginInfo(String pluginId) throws PluginException;
 
     /**
-     * List all plugins in the system
+     * List all plugins in the system.
      *
      * @return list of all plugins' {@link PluginInfo}
      * @throws PluginException
@@ -119,7 +120,7 @@ public interface PluginManager {
     List<PluginInfo> listAllPlugins() throws PluginException;
 
     /**
-     * List all plugins of a certain type
+     * List all plugins of a certain type.
      *
      * @param pluginType type of plugin
      * @return list of {@link PluginInfo}
@@ -128,7 +129,7 @@ public interface PluginManager {
     List<PluginInfo> listPluginsByType(final String pluginType) throws PluginException;
 
     /**
-     * List all plugins by plugin state
+     * List all plugins by plugin state.
      *
      * @param state plugin state, see {@link PluginManager.PluginState}
      * @return list of {@link PluginInfo}
@@ -137,19 +138,17 @@ public interface PluginManager {
     List<PluginInfo> listPluginsByState(final PluginState state) throws PluginException;
 
     /**
-     * List plugins given a type and state
+     * List plugins given a type and state.
      *
      * @param pluginType plugin type
      * @param state      plugin state
      * @return list of {@link PluginInfo}
      * @throws PluginException
      */
-    List<PluginInfo> listPluginsByTypeByState(final String pluginType, final PluginState state)
-            throws PluginException;
-
+    List<PluginInfo> listPluginsByTypeByState(final String pluginType, final PluginState state) throws PluginException;
 
     /**
-     * Get a plugin instance cast to the class of the plugin
+     * Get a plugin instance cast to the class of the plugin.
      *
      * @param pluginId Plugin id to get
      * @param clazz    Class to be Cast
@@ -160,7 +159,7 @@ public interface PluginManager {
     <T extends Plugin> T getPlugin(final String pluginId, final Class<T> clazz) throws PluginException;
 
     /**
-     * The states of a plugin
+     * The states of a plugin.
      */
     enum PluginState {
         /**
