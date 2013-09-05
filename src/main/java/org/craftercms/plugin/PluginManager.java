@@ -35,7 +35,7 @@ public interface PluginManager {
     void init(List<String> pluginFolders, Map<String, Context> contextRegistry) throws PluginException;
 
     /**
-     * Destroy the plugin manager
+     * Destroy the plugin manager.
      *
      * @throws PluginException
      */
@@ -95,7 +95,7 @@ public interface PluginManager {
     void activatePlugin(String pluginId) throws PluginException;
 
     /**
-     * Call the deactivate method of the plugin and mark it as inactive
+     * Call the deactivate method of the plugin and mark it as inactive.
      *
      * @param pluginId
      * @throws PluginException
@@ -163,15 +163,15 @@ public interface PluginManager {
      */
     enum PluginState {
         /**
-         * Enabled and Active
+         * Enabled and Active.
          */
         ENABLED_ACTIVE,
         /**
-         * Enabled and Inactive
+         * Enabled and Inactive.
          */
         ENABLED_INACTIVE,
         /**
-         * Disabled
+         * Disabled.
          */
         DISABLED
     }
