@@ -16,10 +16,15 @@
  */
 package org.craftercms.plugin;
 
+import java.util.jar.Attributes;
+import javax.xml.bind.annotation.XmlRootElement;
+
+
 /**
  * Plugin Information.
  * Reflects Manifest.mf Information.
  */
+@XmlRootElement(name = "plugin-info")
 public class PluginInfo {
     private String id;
     private String name;
@@ -33,9 +38,12 @@ public class PluginInfo {
     private String compatibility;
     private PluginManager.PluginState state;
     private Class clazz;
-
+    private String folder;
     public PluginInfo() {
     }
+
+//    public PluginInfo(Attributes attributes) {
+//    }
 
     public String getId() {
         return this.id;
@@ -131,5 +139,13 @@ public class PluginInfo {
 
     public void setClazz(final Class clazz) {
         this.clazz = clazz;
+    }
+
+    public String getFolder() {
+        return folder;
+    }
+
+    public void setFolder(final String folder) {
+        this.folder = folder;
     }
 }
