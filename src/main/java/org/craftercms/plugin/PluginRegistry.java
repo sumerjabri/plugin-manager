@@ -23,6 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.craftercms.plugin.util.MapAdapter;
+import org.craftercms.plugin.PluginManager.PluginState;
 
 /**
  * @author David Escalante López
@@ -32,7 +33,7 @@ public class PluginRegistry {
 
     // <editor-fold defaultstate="collapsed" desc="Attributes">
 
-    private Map<String, PluginInfo> pluginRegistry;
+    private Map<String, PluginState> pluginRegistry;
 
     // </editor-fold>
 
@@ -43,7 +44,7 @@ public class PluginRegistry {
         pluginRegistry = new HashMap<>();
     }
 
-    public PluginRegistry(final Map<String, PluginInfo> pluginRegistry) {
+    public PluginRegistry(final Map<String, PluginState> pluginRegistry) {
         this.pluginRegistry = pluginRegistry;
     }
 
@@ -52,7 +53,7 @@ public class PluginRegistry {
 
     // <editor-fold defaultstate="collapsed" desc="API">
 
-    public void add(final String pluginId, final PluginInfo pluginInfo) {
+    public void add(final String pluginId, final PluginState pluginInfo) {
         pluginRegistry.put(pluginId, pluginInfo);
     }
 
@@ -62,11 +63,11 @@ public class PluginRegistry {
 
     @XmlJavaTypeAdapter(MapAdapter.class)
     @XmlElement(name="plugins")
-    public Map<String, PluginInfo> getPluginRegistry() {
+    public Map<String, PluginState> getPluginRegistry() {
         return pluginRegistry;
     }
 
-    public void setPluginRegistry(final Map<String, PluginInfo> pluginRegistry) {
+    public void setPluginRegistry(final Map<String, PluginState> pluginRegistry) {
         this.pluginRegistry = pluginRegistry;
     }
 

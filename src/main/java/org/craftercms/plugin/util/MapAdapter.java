@@ -24,16 +24,16 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.craftercms.plugin.PluginInfo;
+import org.craftercms.plugin.PluginManager.PluginState;
 
 /**
  * @author David Escalante López
  */
-public class MapAdapter extends XmlAdapter<MapAdapter.AdaptedMap, Map<String, PluginInfo>> {
+public class MapAdapter extends XmlAdapter<MapAdapter.AdaptedMap, Map<String, PluginState>> {
 
     @Override
-    public Map<String, PluginInfo> unmarshal(final MapAdapter.AdaptedMap adaptedMap) throws Exception {
-        Map<String, PluginInfo> map = new HashMap<>();
+    public Map<String, PluginState> unmarshal(final MapAdapter.AdaptedMap adaptedMap) throws Exception {
+        Map<String, PluginState> map = new HashMap<>();
         for (Entry entry : adaptedMap.entry) {
             map.put(entry.key, entry.value);
         }
@@ -41,9 +41,9 @@ public class MapAdapter extends XmlAdapter<MapAdapter.AdaptedMap, Map<String, Pl
     }
 
     @Override
-    public AdaptedMap marshal(final Map<String, PluginInfo> map) throws Exception {
+    public AdaptedMap marshal(final Map<String, PluginState> map) throws Exception {
         AdaptedMap adaptedMap = new AdaptedMap();
-        for (Map.Entry<String, PluginInfo> mapEntry : map.entrySet()) {
+        for (Map.Entry<String, PluginState> mapEntry : map.entrySet()) {
             Entry entry = new Entry();
             entry.key = mapEntry.getKey();
             entry.value = mapEntry.getValue();
@@ -64,8 +64,8 @@ public class MapAdapter extends XmlAdapter<MapAdapter.AdaptedMap, Map<String, Pl
         @XmlElement(name = "plugin-id")
         public String key;
 
-        @XmlElement(name = "plugin-info")
-        public PluginInfo value;
+        @XmlElement(name = "plugin-state")
+        public PluginState value;
 
     }
 }
