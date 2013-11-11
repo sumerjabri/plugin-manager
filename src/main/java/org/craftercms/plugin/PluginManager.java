@@ -16,6 +16,8 @@
  */
 package org.craftercms.plugin;
 
+import org.craftercms.plugin.exception.PluginManagerException;
+
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -30,16 +32,16 @@ public interface PluginManager {
      *
      * @param pluginFolders   folders that contain plugins
      * @param contextRegistry API contexts registry for various plugin types
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void init(List<String> pluginFolders, Map<String, Context> contextRegistry) throws PluginException;
+    void init(List<String> pluginFolders, Map<String, Context> contextRegistry) throws PluginManagerException;
 
     /**
      * Destroy the plugin manager.
      *
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void destroy() throws PluginException;
+    void destroy() throws PluginManagerException;
 
     /**
      * Register a Context for the Given plugin type.
@@ -48,25 +50,25 @@ public interface PluginManager {
      *
      * @param type    Plugin Type.
      * @param context Context impl.
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void registerContext(final String type, final Context context) throws PluginException;
+    void registerContext(final String type, final Context context) throws PluginManagerException;
 
     /**
      * Install a plugin on disk and load it as disabled.
      *
      * @param plugin input stream of the plugin binary
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void installPlugin(final InputStream plugin) throws PluginException;
+    void installPlugin(final InputStream plugin, final String installPath) throws PluginManagerException;
 
     /**
      * Deactivate, destroy and delete a plugin from disk.
      *
      * @param pluginId ID of the plugin to remove
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void uninstallPlugin(final String pluginId) throws PluginException;
+    void uninstallPlugin(final String pluginId) throws PluginManagerException;
 
     /**
      * Load a plugin from disk if not already loaded and initialize it by calling its init method, upon success
@@ -74,68 +76,68 @@ public interface PluginManager {
      * If the init method of the plugin fails, the plugin is marked as disabled
      *
      * @param pluginId plugin Id
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void enablePlugin(String pluginId) throws PluginException;
+    void enablePlugin(String pluginId) throws PluginManagerException;
 
     /**
      * Call the destroy method of the plugin and mark it as disabled.
      *
      * @param pluginId
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void disablePlugin(String pluginId) throws PluginException;
+    void disablePlugin(String pluginId) throws PluginManagerException;
 
     /**
      * Call the activate method of the plugin and mark it as active.
      *
      * @param pluginId
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void activatePlugin(String pluginId) throws PluginException;
+    void activatePlugin(String pluginId) throws PluginManagerException;
 
     /**
      * Call the deactivate method of the plugin and mark it as inactive.
      *
      * @param pluginId
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void deactivatePlugin(String pluginId) throws PluginException;
+    void deactivatePlugin(String pluginId) throws PluginManagerException;
 
     /**
      * Return the plugin information.
      *
      * @param pluginId Id of the plugin
      * @return plugin information of type {@link PluginInfo}
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    PluginInfo getPluginInfo(String pluginId) throws PluginException;
+    PluginInfo getPluginInfo(String pluginId) throws PluginManagerException;
 
     /**
      * List all plugins in the system.
      *
      * @return list of all plugins' {@link PluginInfo}
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    List<PluginInfo> listAllPlugins() throws PluginException;
+    List<PluginInfo> listAllPlugins() throws PluginManagerException;
 
     /**
      * List all plugins of a certain type.
      *
      * @param pluginType type of plugin
      * @return list of {@link PluginInfo}
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    List<PluginInfo> listPluginsByType(final String pluginType) throws PluginException;
+    List<PluginInfo> listPluginsByType(final String pluginType) throws PluginManagerException;
 
     /**
      * List all plugins by plugin state.
      *
      * @param state plugin state, see {@link PluginManager.PluginState}
      * @return list of {@link PluginInfo}
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    List<PluginInfo> listPluginsByState(final PluginState state) throws PluginException;
+    List<PluginInfo> listPluginsByState(final PluginState state) throws PluginManagerException;
 
     /**
      * List plugins given a type and state.
@@ -143,9 +145,9 @@ public interface PluginManager {
      * @param pluginType plugin type
      * @param state      plugin state
      * @return list of {@link PluginInfo}
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    List<PluginInfo> listPluginsByTypeByState(final String pluginType, final PluginState state) throws PluginException;
+    List<PluginInfo> listPluginsByTypeByState(final String pluginType, final PluginState state) throws PluginManagerException;
 
     /**
      * The states of a plugin.

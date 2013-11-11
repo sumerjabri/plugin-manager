@@ -16,6 +16,8 @@
  */
 package org.craftercms.plugin;
 
+import org.craftercms.plugin.exception.PluginManagerException;
+
 /**
  * Plugin Interface.
  * <p/>
@@ -34,29 +36,29 @@ public interface Plugin {
      * required resources.
      *
      * @param context the API provided to this type of plugin
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void init(Context context) throws PluginException;
+    void init(Context context) throws PluginManagerException;
 
     /**
      * Activate an already initialized plugin. Start the plugin here.
      *
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void activate() throws PluginException;
+    void activate() throws PluginManagerException;
 
     /**
      * Deactivate the plugin. Stop the plugin here, but expect the possibility of being started again.
      *
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void deactivate() throws PluginException;
+    void deactivate() throws PluginManagerException;
 
     /**
      * Destroy the plugin. Free up any resources allocated during Init and shutdown the plugin. Init will be invoked
      * if the plugin is required again.
      *
-     * @throws PluginException
+     * @throws org.craftercms.plugin.exception.PluginManagerException
      */
-    void destroy() throws PluginException;
+    void destroy() throws PluginManagerException;
 }

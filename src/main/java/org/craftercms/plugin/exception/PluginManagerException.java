@@ -14,20 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.plugin;
+package org.craftercms.plugin.exception;
 
 /**
- * Plugin Exception.
+ * Plugin Manager Exception.
  * <p/>
  * Parent wrapper of all plugin exceptions.
  */
-public class PluginException extends Exception {
+public class PluginManagerException extends Exception {
 
-    public PluginException(final String message) {
+    public PluginManagerException(final String message) {
         super(message);
     }
 
-    public PluginException(final String message, final Throwable cause) {
+    public PluginManagerException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

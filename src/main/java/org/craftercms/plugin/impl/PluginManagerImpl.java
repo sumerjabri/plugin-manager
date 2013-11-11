@@ -23,10 +23,9 @@ import javax.xml.bind.Unmarshaller;
 
 import org.craftercms.plugin.Context;
 import org.craftercms.plugin.Plugin;
-import org.craftercms.plugin.PluginException;
+import org.craftercms.plugin.exception.PluginManagerException;
 import org.craftercms.plugin.PluginInfo;
 import org.craftercms.plugin.PluginManager;
-import org.craftercms.plugin.PluginRegistry;
 
 
 import org.craftercms.plugin.constants.ManifestFields;
@@ -73,13 +72,13 @@ public final class PluginManagerImpl implements PluginManager {
 
     @Override
     public void init(final List<String> pluginFolders, final Map<String, Context> contextRegistry) throws
-        PluginException {
+            PluginManagerException {
         this.contextRegistry = contextRegistry;
         loadFolders(pluginFolders);
     }
 
     @Override
-    public void destroy() throws PluginException {
+    public void destroy() throws PluginManagerException {
         save(pluginInfoRegistry);
         for (String pluginId : pluginRegistry.keySet()) {
             Plugin plugin = pluginRegistry.get(pluginId);
@@ -88,12 +87,15 @@ public final class PluginManagerImpl implements PluginManager {
     }
 
     @Override
-    public void registerContext(final String type, final Context context) throws PluginException {
+    public void registerContext(final String type, final Context context) throws PluginManagerException {
         this.contextRegistry.put(type, context);
     }
 
     @Override
-    public void installPlugin(final InputStream plugin) throws PluginException {
+    public void installPlugin(final InputStream plugin, String installPath) throws PluginManagerException {
+
+        // TODO USE INSTALLPATH
+
         try {
             JarInputStream jarInputStream = new JarInputStream(plugin);
             PluginInfo pluginInfo = pluginInfoFromManifest(jarInputStream.getManifest());
@@ -114,20 +116,20 @@ public final class PluginManagerImpl implements PluginManager {
     }
 
     @Override
-    public void uninstallPlugin(final String pluginId) throws PluginException {
+    public void uninstallPlugin(final String pluginId) throws PluginManagerException {
         PluginInfo pluginInfo = pluginInfoRegistry.remove(pluginId);
         Plugin plugin = pluginRegistry.get(pluginId);
         if (pluginInfo != null && plugin != null) {
             plugin.destroy();
         } else {
             log.error(String.format("Plugin with ID: %S doesn't exist.", pluginId));
-            throw new PluginException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
+            throw new PluginManagerException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
         }
         //TODO: Check to save changes or do it at the end.
     }
 
     @Override
-    public void enablePlugin(final String pluginId) throws PluginException {
+    public void enablePlugin(final String pluginId) throws PluginManagerException {
         PluginInfo pluginInfo = pluginInfoRegistry.get(pluginId);
 
         if (pluginInfo != null) {
@@ -148,12 +150,12 @@ public final class PluginManagerImpl implements PluginManager {
             pluginRegistry.put(pluginId, plugin);
         } else {
             log.error(String.format("Plugin with ID: %S doesn't exist.", pluginId));
-            throw new PluginException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
+            throw new PluginManagerException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
         }
     }
 
     @Override
-    public void disablePlugin(final String pluginId) throws PluginException {
+    public void disablePlugin(final String pluginId) throws PluginManagerException {
         PluginInfo pluginInfo = pluginInfoRegistry.get(pluginId);
         Plugin plugin = pluginRegistry.get(pluginId);
 
@@ -163,12 +165,12 @@ public final class PluginManagerImpl implements PluginManager {
             pluginInfoRegistry.remove(pluginId);
         } else {
             log.error(String.format("Plugin with ID: %S doesn't exist.", pluginId));
-            throw new PluginException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
+            throw new PluginManagerException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
         }
     }
 
     @Override
-    public void activatePlugin(final String pluginId) throws PluginException {
+    public void activatePlugin(final String pluginId) throws PluginManagerException {
         //TODO Check rules if active has to be enable
         PluginInfo pluginInfo = pluginInfoRegistry.get(pluginId);
         Plugin plugin = pluginRegistry.get(pluginId);
@@ -178,12 +180,12 @@ public final class PluginManagerImpl implements PluginManager {
             plugin.activate();
         } else {
             log.error(String.format("Plugin with ID: %S doesn't exist.", pluginId));
-            throw new PluginException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
+            throw new PluginManagerException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
         }
     }
 
     @Override
-    public void deactivatePlugin(final String pluginId) throws PluginException {
+    public void deactivatePlugin(final String pluginId) throws PluginManagerException {
         PluginInfo pluginInfo = pluginInfoRegistry.get(pluginId);
 
         //TODO We need better exception handling here
@@ -193,24 +195,24 @@ public final class PluginManagerImpl implements PluginManager {
             pluginInfo.setState(PluginState.ENABLED_INACTIVE);
         } else {
             log.error(String.format("Plugin with ID: %S doesn't exist.", pluginId));
-            throw new PluginException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
+            throw new PluginManagerException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
         }
     }
 
     @Override
-    public PluginInfo getPluginInfo(final String pluginId) throws PluginException {
+    public PluginInfo getPluginInfo(final String pluginId) throws PluginManagerException {
         PluginInfo pluginInfo = pluginInfoRegistry.get(pluginId);
 
         if (pluginInfo != null) {
             return pluginInfo;
         } else {
             log.error(String.format("Plugin with ID: %S doesn't exist.", pluginId));
-            throw new PluginException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
+            throw new PluginManagerException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
         }
     }
 
     @Override
-    public List<PluginInfo> listAllPlugins() throws PluginException {
+    public List<PluginInfo> listAllPlugins() throws PluginManagerException {
         List<PluginInfo> plugins = new ArrayList<>();
 
         for (String pluginId : pluginInfoRegistry.keySet()) {
@@ -222,7 +224,7 @@ public final class PluginManagerImpl implements PluginManager {
     }
 
     @Override
-    public List<PluginInfo> listPluginsByType(final String pluginType) throws PluginException {
+    public List<PluginInfo> listPluginsByType(final String pluginType) throws PluginManagerException {
         List<PluginInfo> plugins = new ArrayList<>();
 
         for (String pluginId : pluginInfoRegistry.keySet()) {
@@ -236,7 +238,7 @@ public final class PluginManagerImpl implements PluginManager {
     }
 
     @Override
-    public List<PluginInfo> listPluginsByState(final PluginState state) throws PluginException {
+    public List<PluginInfo> listPluginsByState(final PluginState state) throws PluginManagerException {
         List<PluginInfo> plugins = new ArrayList<>();
 
         for (String pluginId : pluginInfoRegistry.keySet()) {
@@ -251,7 +253,7 @@ public final class PluginManagerImpl implements PluginManager {
 
     @Override
     public List<PluginInfo> listPluginsByTypeByState(final String pluginType, final PluginState state) throws
-        PluginException {
+            PluginManagerException {
         List<PluginInfo> plugins = new ArrayList<>();
 
         for (String pluginId : pluginInfoRegistry.keySet()) {
@@ -310,7 +312,7 @@ public final class PluginManagerImpl implements PluginManager {
         return pluginRegistry.getPluginRegistry();
     }
 
-    private void loadFolders(final List<String> pluginFolders) throws PluginException {
+    private void loadFolders(final List<String> pluginFolders) throws PluginManagerException {
 
         Map<String, PluginState> pluginStatesRegistry = loadPluginState();
 
@@ -352,7 +354,7 @@ public final class PluginManagerImpl implements PluginManager {
             save(pluginInfoRegistry);
         } catch (IOException ioE) {
             log.error("Could not loadPluginState Jar Files");
-            throw new PluginException("Could not loadPluginState Jar Files");
+            throw new PluginManagerException("Could not loadPluginState Jar Files");
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -377,7 +379,7 @@ public final class PluginManagerImpl implements PluginManager {
 
     }
 
-    private PluginInfo pluginInfoFromManifest(final Manifest carFileManifest) throws PluginException {
+    private PluginInfo pluginInfoFromManifest(final Manifest carFileManifest) throws PluginManagerException {
         PluginInfo pluginInfo = null;
 
         try {
@@ -399,7 +401,7 @@ public final class PluginManagerImpl implements PluginManager {
 
         } catch (ClassNotFoundException cnfe) {
             log.error("Class not found");
-            throw new PluginException("Class not found");
+            throw new PluginManagerException("Class not found");
         }
         return pluginInfo;
     }
