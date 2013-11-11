@@ -148,17 +148,6 @@ public interface PluginManager {
     List<PluginInfo> listPluginsByTypeByState(final String pluginType, final PluginState state) throws PluginException;
 
     /**
-     * Get a plugin instance cast to the class of the plugin.
-     *
-     * @param pluginId Plugin id to get
-     * @param clazz    Class to be Cast
-     * @param <T>      Class to be wanted.
-     * @return A instance of the given class that implements {@link Plugin}
-     * @throws PluginException
-     */
-    <T extends Plugin> T getPlugin(final String pluginId, final Class<T> clazz) throws PluginException;
-
-    /**
      * The states of a plugin.
      */
     enum PluginState {
