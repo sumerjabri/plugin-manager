@@ -186,10 +186,11 @@ public final class PluginManagerImpl implements PluginManager {
     public void deactivatePlugin(final String pluginId) throws PluginException {
         PluginInfo pluginInfo = pluginInfoRegistry.get(pluginId);
 
+        //TODO We need better exception handling here
         if (pluginInfo != null) {
-            pluginInfo.setState(PluginState.ENABLED_INACTIVE);
-            Plugin plugin = getPlugin(pluginInfo.getId(), pluginInfo.getClazz());
+            Plugin plugin = pluginRegistry.get(pluginInfo.getId());
             plugin.deactivate();
+            pluginInfo.setState(PluginState.ENABLED_INACTIVE);
         } else {
             log.error(String.format("Plugin with ID: %S doesn't exist.", pluginId));
             throw new PluginException(String.format("Plugin with ID: %S doesn't exist.", pluginId));
@@ -261,31 +262,6 @@ public final class PluginManagerImpl implements PluginManager {
         }
 
         return plugins;
-    }
-
-    @Override
-    public <T extends Plugin> T getPlugin(final String pluginId, final Class<T> clazz) throws PluginException {
-
-        Plugin plugin = pluginRegistry.get(pluginId);
-
-        if (plugin == null) {
-            PluginInfo pluginInfo = pluginInfoRegistry.get(pluginId);
-            if (pluginInfo != null) {
-                try {
-                    plugin = (Plugin) pluginInfo.getClazz().newInstance();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                log.error(String.format("Plugin with ID: %s doesn't exist.", pluginId));
-                throw new PluginException(String.format("Plugin with ID: %s doesn't exist.", pluginId));
-            }
-        }
-
-        return clazz.cast(plugin);
-
     }
 
     // </editor-fold>editor-fold>
