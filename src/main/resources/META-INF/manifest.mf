@@ -8,3 +8,4 @@ plugin-cost:
 plugin-type:
 plugin-compatibility:
 plugin-class-name:
+plugin-dependencies:
